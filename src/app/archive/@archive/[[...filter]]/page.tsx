@@ -2,9 +2,16 @@ import Link from "next/link";
 
 import { getAvailableNewsYears } from "@/app/lib/news";
 
-export interface ArchivePageProps {}
+// import NewsList from "@/components/news-list";
 
-export default function ArchivePage({}: ArchivePageProps) {
+export interface FilteredNewsPageProps {
+  params: { filter: number };
+}
+
+export default function FilteredNewsPage({ params }: FilteredNewsPageProps) {
+  const filter = params.filter;
+  console.log(filter);
+
   const links = getAvailableNewsYears();
 
   return (
@@ -20,4 +27,11 @@ export default function ArchivePage({}: ArchivePageProps) {
       </nav>
     </header>
   );
+  // const news = getNewsForYear(newsYear);
+
+  // return (
+  //   <>
+  //     <NewsList news={news} />
+  //   </>
+  // );
 }
