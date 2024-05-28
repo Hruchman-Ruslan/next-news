@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 
-import MainHeader from "@/components/main-header";
-
-import "./globals.css";
+import "../global.css";
 
 export const metadata: Metadata = {
   title: "Next-News",
@@ -16,12 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <div id="page">
-          <MainHeader />
-          {children}
-        </div>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
