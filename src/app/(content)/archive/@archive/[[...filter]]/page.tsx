@@ -10,25 +10,27 @@ import {
 import NewsList from "@/components/news-list";
 
 export interface FilteredNewsPageProps {
-  params: { filter: number[] };
+  params: { filter: string };
 }
 
-export default function FilteredNewsPage({ params }: FilteredNewsPageProps) {
+export default async function FilteredNewsPage({
+  params,
+}: FilteredNewsPageProps) {
   const filter = params.filter;
 
   const selectedYear = filter?.[0];
   const selectedMonth = filter?.[1];
 
   let news;
-  let links = getAvailableNewsYears();
+  let links = await getAvailableNewsYears();
 
   if (selectedYear && !selectedMonth) {
-    news = getNewsForYear(selectedYear);
-    links = getAvailableNewsMonths(selectedYear);
+    news = await getNewsForYear(selectedYear);
+    links = await getAvailableNewsMonths(selectedYear);
   }
 
   if (selectedYear && selectedMonth) {
-    news = getNewsForYearAndMonth(selectedYear, selectedMonth);
+    news = await getNewsForYearAndMonth(selectedYear, selectedMonth);
     links = [];
   }
 
@@ -38,10 +40,14 @@ export default function FilteredNewsPage({ params }: FilteredNewsPageProps) {
     newsContent = <NewsList news={news} />;
   }
 
+  const availableYears = await getAvailableNewsYears();
+  const availableMonths = selectedYear
+    ? await getAvailableNewsMonths(selectedYear)
+    : [];
+
   if (
-    (selectedYear && !getAvailableNewsYears().includes(+selectedYear)) ||
-    (selectedMonth &&
-      !getAvailableNewsMonths(selectedYear).includes(+selectedMonth))
+    (selectedYear && !availableYears.includes(selectedYear)) ||
+    (selectedMonth && !availableMonths.includes(selectedMonth))
   ) {
     throw new Error("Invalid filter.");
   }

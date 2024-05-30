@@ -1,5 +1,5 @@
 export interface NewsLoadingProps {}
 
 export default function NewsLoading({}: NewsLoadingProps) {
-  return <p>Loading...</p>;
+  return <p>Loading ...</p>;
 }

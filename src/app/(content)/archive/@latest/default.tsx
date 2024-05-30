@@ -4,8 +4,8 @@ import NewsList from "@/components/news-list";
 
 export interface LatestNewsPageProps {}
 
-export default function LatestNewsPage({}: LatestNewsPageProps) {
-  const latestNews = getLatestNews();
+export default async function LatestNewsPage({}: LatestNewsPageProps) {
+  const latestNews = await getLatestNews();
 
   return (
     <>

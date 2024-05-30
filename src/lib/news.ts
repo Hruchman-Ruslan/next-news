@@ -1,56 +1,78 @@
 import sql from "better-sqlite3";
 
-import { DUMMY_NEWS } from "@/dummy-news";
 import { INewsItem } from "@/types/news.type";
+
+interface IYear {
+  year: string;
+}
+
+interface IMonth {
+  month: string;
+}
 
 const db = sql("data.db");
 
-export async function getAllNews() {
+export async function getAllNews(): Promise<INewsItem[]> {
   const news = db.prepare("SELECT * FROM news").all() as INewsItem[];
   await new Promise((resolve) => setTimeout(resolve, 2000));
   return news;
 }
 
-export function getLatestNews(): INewsItem[] {
-  return DUMMY_NEWS.slice(0, 3);
+export async function getNewsItem(slug: string): Promise<INewsItem> {
+  const newsItem = db
+    .prepare("SELECT * FROM news WHERE slug = ?")
+    .get(slug) as INewsItem;
+
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  return newsItem;
 }
 
-export function getAvailableNewsYears(): number[] {
-  return DUMMY_NEWS.reduce((years: number[], news: INewsItem) => {
-    const year = new Date(news.date).getFullYear();
-    if (!years.includes(year)) {
-      years.push(year);
-    }
-    return years;
-  }, []).sort((a, b) => b - a);
+export async function getLatestNews(): Promise<INewsItem[]> {
+  const latestNews = db
+    .prepare("SELECT * FROM news ORDER BY date DESC LIMIT 3")
+    .all() as INewsItem[];
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  return latestNews;
 }
 
-export function getAvailableNewsMonths(year: number): number[] {
-  return DUMMY_NEWS.reduce((months: number[], news: INewsItem) => {
-    const newsYear = new Date(news.date).getFullYear();
-    if (newsYear === +year) {
-      const month = new Date(news.date).getMonth();
-      if (!months.includes(month)) {
-        months.push(month + 1);
-      }
-    }
-    return months;
-  }, []).sort((a, b) => b - a);
+export async function getAvailableNewsYears(): Promise<string[]> {
+  const years = db
+    .prepare("SELECT DISTINCT strftime('%Y', date) as year FROM news")
+    .all()
+    .map((year) => year.year);
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  return years;
 }
 
-export function getNewsForYear(year: number): INewsItem[] {
-  return DUMMY_NEWS.filter(
-    (news) => new Date(news.date).getFullYear() === +year
-  );
+export async function getAvailableNewsMonths(year: string): Promise<string[]> {
+  const months = db
+    .prepare(
+      "SELECT DISTINCT strftime('%m', date) as month FROM news WHERE strftime('%Y', date) = ?"
+    )
+    .all(year)
+    .map((month) => month.month);
+  return months;
 }
 
-export function getNewsForYearAndMonth(
-  year: number,
-  month: number
-): INewsItem[] {
-  return DUMMY_NEWS.filter((news) => {
-    const newsYear = new Date(news.date).getFullYear();
-    const newsMonth = new Date(news.date).getMonth() + 1;
-    return newsYear === +year && newsMonth === +month;
-  });
+export async function getNewsForYear(year: string): Promise<INewsItem[]> {
+  const news = db
+    .prepare(
+      "SELECT * FROM news WHERE strftime('%Y', date) = ? ORDER BY date DESC"
+    )
+    .all(year) as INewsItem[];
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  return news;
+}
+
+export async function getNewsForYearAndMonth(
+  year: string,
+  month: string
+): Promise<INewsItem[]> {
+  const news = db
+    .prepare(
+      "SELECT * FROM news WHERE strftime('%Y', date) = ? AND strftime('%m', date) = ? ORDER BY date DESC"
+    )
+    .all(year, month) as INewsItem[];
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  return news;
 }
