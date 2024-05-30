@@ -5,7 +5,7 @@ import NewsList from "@/components/news-list";
 export interface NewsPageProps {}
 
 export default async function NewsPage({}: NewsPageProps) {
-  const news = getAllNews();
+  const news = await getAllNews();
 
   return (
     <>
