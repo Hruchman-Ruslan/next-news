@@ -1,8 +1,13 @@
+import sql from "better-sqlite3";
+
 import { DUMMY_NEWS } from "@/dummy-news";
 import { INewsItem } from "@/types/news.type";
 
-export function getAllNews(): INewsItem[] {
-  return DUMMY_NEWS;
+const db = sql("data.db");
+
+export function getAllNews() {
+  const news = db.prepare("SELECT * FROM news").all() as INewsItem[];
+  return news;
 }
 
 export function getLatestNews(): INewsItem[] {
